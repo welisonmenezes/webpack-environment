@@ -1,6 +1,6 @@
 const path = require('path');
-var webpack = require('webpack');
 module.exports = {
+	mode: 'development',
 	entry: {
 		main: './app/main.js'
 	},

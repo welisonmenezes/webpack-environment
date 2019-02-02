@@ -7,8 +7,3 @@ export default class Uppercase {
 		return this._str;
 	}
 }
-
-
-// module.exports = function() {
-//     alert('upercase');
-// };
