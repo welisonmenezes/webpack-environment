@@ -31,7 +31,7 @@ module.exports = {
                 use: [
                     MiniCssExtractPlugin.loader,
                     {
-                        loader: 'css-loader'
+                        loader: 'css-loader?url=false'
                     },
                     {
                         loader: 'sass-loader?includePaths[]=' + path.resolve(__dirname, "./node_modules/compass-mixins/lib")

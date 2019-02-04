@@ -6923,9 +6923,9 @@ a.text-dark:hover, a.text-dark:focus {
 
 /*
 @import 'compass/utilities/sprites';
-@import '../img/icons/*.png';
+@import 'img/icons/*.png';
 @include all-my-icons-sprites;
-*/
+/**/
 #opacity-10 {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=10);
   opacity: 0.1; }
@@ -6934,4 +6934,9 @@ body {
   background: #f4f4f4; }
   body h1 {
     color: #333; }
+
+.global-icon {
+  width: 30px;
+  height: 30px;
+  background: url("../img/icons/global.png") no-repeat; }
 

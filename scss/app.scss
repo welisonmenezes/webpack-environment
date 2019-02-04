@@ -2,9 +2,9 @@
 
 /*
 @import 'compass/utilities/sprites';
-@import '../img/icons/*.png';
+@import 'img/icons/*.png';
 @include all-my-icons-sprites;
-*/
+/**/
 #opacity-10 {
   @include opacity(0.1);
 }
