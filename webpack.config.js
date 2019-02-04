@@ -1,5 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+var SpritesmithPlugin = require('webpack-spritesmith');
 
 module.exports = {
 	mode: 'development',
@@ -11,11 +12,6 @@ module.exports = {
 		path: path.resolve(__dirname, 'dist'),
         publicPath: 'dist',
 	},
-    plugins: [
-        new MiniCssExtractPlugin({
-          filename: 'styles.css'
-        })
-    ],
 	module: {
         rules: [
             {
@@ -34,17 +30,17 @@ module.exports = {
                         loader: 'css-loader'
                     },
                     {
-                        loader: 'sass-loader?includePaths[]=' + path.resolve(__dirname, "./node_modules/compass-mixins/lib")
+                        loader: 'sass-loader?includePaths[]=' + path.resolve(__dirname, './node_modules/compass-mixins/lib')
                     }
                 ]
             },
             {
-                test: /\.(jpg|png)$/,
+                test: /\.(jpg|png|gif|jpeg|svg)$/,
                 use: [
                     {
-                        loader: "file-loader",
+                        loader: 'file-loader',
                         options: {  
-                            name: "[path][name].[hash].[ext]",
+                            name: '[path][name].[hash].[ext]',
                             publicPath: './'
                         }
                     }
@@ -52,6 +48,27 @@ module.exports = {
             }
         ]
     },
+    resolve: {
+        modules: ['node_modules', 'img']
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+          filename: 'styles.css'
+        }),
+        new SpritesmithPlugin({
+            src: {
+                cwd: path.resolve(__dirname, 'img/icons'),
+                glob: '*.png'
+            },
+            target: {
+                image: path.resolve(__dirname, 'dist/img/sprite.png'),
+                css: path.resolve(__dirname, 'scss/sprite.scss')
+            },
+            apiOptions: {
+                cssImageRef: '~sprite.png'
+            }
+        })
+    ],
     devServer: {
         contentBase: path.join(__dirname, '/'),
         compress: true,
