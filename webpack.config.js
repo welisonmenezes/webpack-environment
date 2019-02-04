@@ -31,10 +31,22 @@ module.exports = {
                 use: [
                     MiniCssExtractPlugin.loader,
                     {
-                        loader: 'css-loader?url=false'
+                        loader: 'css-loader'
                     },
                     {
                         loader: 'sass-loader?includePaths[]=' + path.resolve(__dirname, "./node_modules/compass-mixins/lib")
+                    }
+                ]
+            },
+            {
+                test: /\.(jpg|png)$/,
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {  
+                            name: "[path][name].[hash].[ext]",
+                            publicPath: './'
+                        }
                     }
                 ]
             }
