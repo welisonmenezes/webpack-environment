@@ -1,7 +1,12 @@
-body{
-	background: #f4f4f4;
+@import 'compass'; 
 
-	h1{
-		color: #333;
-	}
+/*
+@import 'compass/utilities/sprites';
+@import '../img/icons/*.png';
+@include all-my-icons-sprites;
+*/
+#opacity-10 {
+  @include opacity(0.1);
 }
+
+@import 'reset.scss';
