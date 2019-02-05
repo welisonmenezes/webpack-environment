@@ -2,9 +2,10 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-	mode: 'development',
+	mode: 'production', // [development, production]
 	entry: {
 		main: './app/main.js'
 	},
@@ -61,6 +62,11 @@ module.exports = {
                 from:'img/*',
                 to:'',
                 ignore: [ 'img/icons/*' ]
+            },
+            {
+                from:'*.html',
+                to:'',
+                ignore: []
             }
         ]),
         new SpritesmithPlugin({
@@ -77,6 +83,13 @@ module.exports = {
             }
         })
     ],
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                extractComments: true
+            })
+        ]
+    },
     devServer: {
         contentBase: path.join(__dirname, '/'),
         compress: true,
