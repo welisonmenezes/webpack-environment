@@ -27,7 +27,13 @@ if (process.env.NODE_ENV === 'development') {
             }
         }),
         new OptimizeCssAssetsPlugin({
-            cssProcessorOptions: { sourcemap: true },
+            cssProcessorOptions: {
+                sourcemap: true,
+                map: {
+                    inline: false, // set to false if you want CSS source maps
+                    annotation: true
+                }
+            },
             cssProcessorPluginOptions: {
                 preset: ['default', { discardComments: { removeAll: true } }]
             }
@@ -124,10 +130,9 @@ module.exports = {
         }),
         new webpack.optimize.ModuleConcatenationPlugin(),
         new webpack.EvalSourceMapDevToolPlugin({
-            filename: '[name].js.map'
+            filename: '[file].map'
         })
     ],
-    devtool: 'source-map',
     optimization: {
         minimizer: minimizer,
         splitChunks: {
@@ -148,6 +153,7 @@ module.exports = {
         maxEntrypointSize: 512000,
         maxAssetSize: 512000
     },
+    devtool: 'source-map',
     devServer: {
         contentBase: path.join(__dirname, '/'),
         publicPath: '/',
