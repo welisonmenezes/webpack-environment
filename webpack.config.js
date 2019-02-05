@@ -6,8 +6,35 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+
+let SERVICE_URL;
+let minimizer;
+
+if (process.env.NODE_ENV === 'development') {
+    SERVICE_URL = JSON.stringify('http://localhost:3000');
+} else {
+    SERVICE_URL = JSON.stringify('http://production-url.com');
+
+    minimizer = [
+        new UglifyJsPlugin({
+            sourceMap: true,
+            uglifyOptions: {
+                output: {
+                    comments: false
+                }
+            }
+        }),
+        new OptimizeCssAssetsPlugin({
+            cssProcessorOptions: { sourcemap: true },
+            cssProcessorPluginOptions: {
+                preset: ['default', { discardComments: { removeAll: true } }]
+            }
+        })
+    ];
+}
+
 module.exports = {
-	mode: 'production', // [development, production]
+	mode: 'development', // [development, production]
 	entry: {
 		bundle: ['./app/main.js']
 	},
@@ -85,27 +112,21 @@ module.exports = {
                 cssImageRef: '~sprite.png'
             }
         }),
+        new webpack.DefinePlugin({
+            SERVICE_URL: SERVICE_URL
+        }),
         new webpack.ProvidePlugin({
             $: 'jquery/dist/jquery.js',
             jQuery: 'jquery/dist/jquery.js'
         }),
-        new webpack.optimize.ModuleConcatenationPlugin()
+        new webpack.optimize.ModuleConcatenationPlugin(),
+        new webpack.EvalSourceMapDevToolPlugin({
+            filename: '[name].js.map'
+        })
     ],
+    devtool: 'source-map',
     optimization: {
-        minimizer: [
-            new UglifyJsPlugin({
-                uglifyOptions: {
-                    output: {
-                        comments: false
-                    }
-                }
-            }),
-            new OptimizeCssAssetsPlugin({
-                cssProcessorPluginOptions: {
-                    preset: ['default', { discardComments: { removeAll: true } }]
-                }
-            })
-        ],
+        minimizer: minimizer,
         splitChunks: {
             chunks: 'all',
             maxInitialRequests: Infinity,
