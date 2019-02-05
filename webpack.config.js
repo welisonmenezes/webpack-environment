@@ -1,6 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-var SpritesmithPlugin = require('webpack-spritesmith');
+const SpritesmithPlugin = require('webpack-spritesmith');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
 	mode: 'development',
@@ -55,6 +56,13 @@ module.exports = {
         new MiniCssExtractPlugin({
           filename: 'styles.css'
         }),
+        new CopyWebpackPlugin([
+            {
+                from:'img/*',
+                to:'',
+                ignore: [ 'img/icons/*' ]
+            }
+        ]),
         new SpritesmithPlugin({
             src: {
                 cwd: path.resolve(__dirname, 'img/icons'),
