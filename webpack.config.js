@@ -9,10 +9,12 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 let SERVICE_URL;
 let minimizer;
-
 if (process.env.NODE_ENV === 'development') {
+
     SERVICE_URL = JSON.stringify('http://localhost:3000');
+
 } else {
+
     SERVICE_URL = JSON.stringify('http://production-url.com');
 
     minimizer = [
@@ -34,7 +36,8 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 module.exports = {
-	mode: 'development', // [development, production]
+	mode: 'production', // [development, production]
+    watch: true,
 	entry: {
 		bundle: ['./app/main.js']
 	},
@@ -142,6 +145,7 @@ module.exports = {
     },
     devServer: {
         contentBase: path.join(__dirname, '/'),
+        publicPath: '/',
         compress: true,
         port: 9000
     }
