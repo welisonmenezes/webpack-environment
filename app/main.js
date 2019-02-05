@@ -1,7 +1,9 @@
 import 'bootstrap/scss/bootstrap.scss';
+import 'slick-carousel/slick/slick.scss';
 
 import 'popper.js';
 import 'bootstrap/dist/js/bootstrap.js';
+import 'slick-carousel/slick/slick.js';
 
 import '../scss/app.scss';
 
@@ -22,3 +24,7 @@ const l = new Lowercase('WELISON');
 console.log(l.getLowercase());
 
 $('h1').css('color', 'red');
+
+$(document).ready(function(){
+  $('.slick-car').slick({});
+});
