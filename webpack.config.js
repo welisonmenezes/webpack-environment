@@ -108,7 +108,7 @@ module.exports = {
                 glob: '*.png'
             },
             target: {
-                image: path.resolve(__dirname, 'dist/img/sprite.png'),
+                image: path.resolve(__dirname, 'img/sprite.png'),
                 css: path.resolve(__dirname, 'scss/sprite.scss')
             },
             apiOptions: {
@@ -142,6 +142,11 @@ module.exports = {
                 }
             }
         }
+    },
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
     },
     devServer: {
         contentBase: path.join(__dirname, '/'),
