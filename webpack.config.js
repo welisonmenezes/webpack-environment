@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -8,10 +9,10 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 module.exports = {
 	mode: 'production', // [development, production]
 	entry: {
-		main: './app/main.js'
+		bundle: ['./app/main.js']
 	},
 	output: {
-		filename: 'bundle.js',
+		filename: '[name].js',
 		path: path.resolve(__dirname, 'dist'),
         publicPath: 'dist',
 	},
@@ -56,7 +57,8 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-          filename: 'styles.css'
+          filename: '[name].css',
+          chunkFilename: "vendor.css"
         }),
         new CopyWebpackPlugin([
             {
@@ -82,19 +84,40 @@ module.exports = {
             apiOptions: {
                 cssImageRef: '~sprite.png'
             }
-        })
+        }),
+        new webpack.ProvidePlugin({
+            $: 'jquery/dist/jquery.js',
+            jQuery: 'jquery/dist/jquery.js'
+        }),
+        new webpack.optimize.ModuleConcatenationPlugin()
     ],
     optimization: {
         minimizer: [
             new UglifyJsPlugin({
-                extractComments: true
+                uglifyOptions: {
+                    output: {
+                        comments: false
+                    }
+                }
             }),
             new OptimizeCssAssetsPlugin({
                 cssProcessorPluginOptions: {
                     preset: ['default', { discardComments: { removeAll: true } }]
                 }
             })
-        ]
+        ],
+        splitChunks: {
+            chunks: 'all',
+            maxInitialRequests: Infinity,
+            minSize: 0,
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendor',
+                    enforce: true
+                }
+            }
+        }
     },
     devServer: {
         contentBase: path.join(__dirname, '/'),

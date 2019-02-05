@@ -1,6 +1,5 @@
 import 'bootstrap/scss/bootstrap.scss';
 
-import $ from 'jquery';
 import 'popper.js';
 import 'bootstrap/dist/js/bootstrap.js';
 
