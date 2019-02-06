@@ -86,6 +86,16 @@ module.exports = {
                         }
                     }
                 ]
+            },
+            {
+                test: /\.(ttf|eot|woff|woff2)$/,
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: '../[path][name].[ext]',
+                        publicPath: './'
+                    }
+                }
             }
         ]
     },
@@ -101,6 +111,11 @@ module.exports = {
             },
             {
                 from:'*.html',
+                to:'',
+                ignore: []
+            },
+            {
+                from:'fonts/*',
                 to:'',
                 ignore: []
             }
