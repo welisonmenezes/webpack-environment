@@ -9,13 +9,14 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 let SERVICE_URL;
 let minimizer;
+let min = '.min';
 if (process.env.NODE_ENV === 'development') {
 
-    SERVICE_URL = JSON.stringify('http://localhost:3000');
+    SERVICE_URL = JSON.stringify('http://development-url-here/');
 
 } else {
 
-    SERVICE_URL = JSON.stringify('http://production-url.com');
+    SERVICE_URL = JSON.stringify('http://production-url-here/');
 
     minimizer = [
         new UglifyJsPlugin({
@@ -43,12 +44,12 @@ if (process.env.NODE_ENV === 'development') {
 
 module.exports = {
 	mode: 'production', // [development, production]
-    watch: true,
+    watch: false,
 	entry: {
 		bundle: ['./app/main.js']
 	},
 	output: {
-		filename: '[name].js',
+		filename: 'js/[name]' + min + '.js',
 		path: path.resolve(__dirname, 'dist'),
         publicPath: 'dist',
 	},
@@ -80,7 +81,7 @@ module.exports = {
                     {
                         loader: 'file-loader',
                         options: {  
-                            name: '[path][name].[hash].[ext]',
+                            name: '../[path][name].[ext]',
                             publicPath: './'
                         }
                     }
@@ -92,10 +93,6 @@ module.exports = {
         modules: ['node_modules', 'img']
     },
     plugins: [
-        new MiniCssExtractPlugin({
-          filename: '[name].css',
-          chunkFilename: "vendor.css"
-        }),
         new CopyWebpackPlugin([
             {
                 from:'img/*',
@@ -114,12 +111,16 @@ module.exports = {
                 glob: '*.png'
             },
             target: {
-                image: path.resolve(__dirname, 'img/sprite.png'),
+                image: path.resolve(__dirname, '../img/sprite.png'),
                 css: path.resolve(__dirname, 'scss/sprite.scss')
             },
             apiOptions: {
-                cssImageRef: '~sprite.png'
+                cssImageRef: '../img/sprite.png'
             }
+        }),
+        new MiniCssExtractPlugin({
+          filename: 'css/[name]' + min + '.css',
+          chunkFilename: 'css/vendor' + min + '.css'
         }),
         new webpack.DefinePlugin({
             SERVICE_URL: SERVICE_URL
