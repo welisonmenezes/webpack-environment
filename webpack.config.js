@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ExtractCssChunks = require('extract-css-chunks-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
@@ -31,7 +31,7 @@ if (process.env.NODE_ENV === 'development') {
             cssProcessorOptions: {
                 sourcemap: true,
                 map: {
-                    inline: false, // set to false if you want CSS source maps
+                    inline: false,
                     annotation: true
                 }
             },
@@ -43,10 +43,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 module.exports = {
-	mode: 'production', // [development, production]
+	mode: 'development', // [development, production]
     watch: false,
 	entry: {
-		bundle: ['./app/main.js']
+        bundle: ['./app/main.js'],
+        vendors: ['jquery', 'bootstrap', 'popper.js'],
+        plugins: ['slick-carousel']
 	},
 	output: {
 		filename: 'js/[name]' + min + '.js',
@@ -66,7 +68,7 @@ module.exports = {
             {
                 test: /\.(css|sass|scss)$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    ExtractCssChunks.loader,
                     {
                         loader: 'css-loader'
                     },
@@ -133,10 +135,16 @@ module.exports = {
                 cssImageRef: '../img/sprite.png'
             }
         }),
-        new MiniCssExtractPlugin({
-          filename: 'css/[name]' + min + '.css',
-          chunkFilename: 'css/vendor' + min + '.css'
-        }),
+        new ExtractCssChunks(
+            {
+              filename: 'css/[name]' + min + '.css',
+              chunkFilename: 'css/vendors' + min + '.css',
+              hot: true,
+              orderWarning: true,
+              reloadAll: true,
+              cssModules: true
+            }
+        ),
         new webpack.DefinePlugin({
             SERVICE_URL: SERVICE_URL
         }),
@@ -156,10 +164,19 @@ module.exports = {
             maxInitialRequests: Infinity,
             minSize: 0,
             cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendor',
-                    enforce: true
+                vendors: {
+                    name: 'vendors',
+                    test: 'vendors',
+                    filename: 'js/[name]' + min + '.js',
+                    enforce: true,
+                    priority: 2
+                },
+                plugins: {
+                    name: 'plugins',
+                    test: 'plugins',
+                    filename: 'js/[name]' + min + '.js',
+                    enforce: true,
+                    priority: 3
                 }
             }
         }
