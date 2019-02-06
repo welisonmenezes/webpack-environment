@@ -5,6 +5,7 @@ const SpritesmithPlugin = require('webpack-spritesmith');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 
 let SERVICE_URL;
@@ -22,6 +23,9 @@ if (process.env.NODE_ENV === 'development') {
         new UglifyJsPlugin({
             sourceMap: true,
             uglifyOptions: {
+                compress: { 
+                    warnings: false 
+                },
                 output: {
                     comments: false
                 }
@@ -43,7 +47,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 module.exports = {
-	mode: 'development', // [development, production]
+	mode: 'production', // [development, production]
     watch: false,
 	entry: {
         bundle: ['./app/main.js'],
@@ -105,6 +109,7 @@ module.exports = {
         modules: ['node_modules', 'img']
     },
     plugins: [
+        new CleanWebpackPlugin('./dist', {}),
         new CopyWebpackPlugin([
             {
                 from:'img/*',
@@ -152,10 +157,7 @@ module.exports = {
             $: 'jquery/dist/jquery.js',
             jQuery: 'jquery/dist/jquery.js'
         }),
-        new webpack.optimize.ModuleConcatenationPlugin(),
-        new webpack.EvalSourceMapDevToolPlugin({
-            filename: '[file].map'
-        })
+        new webpack.optimize.ModuleConcatenationPlugin()
     ],
     optimization: {
         minimizer: minimizer,
@@ -169,14 +171,14 @@ module.exports = {
                     test: 'vendors',
                     filename: 'js/[name]' + min + '.js',
                     enforce: true,
-                    priority: 2
+                    priority: 3
                 },
                 plugins: {
                     name: 'plugins',
                     test: 'plugins',
                     filename: 'js/[name]' + min + '.js',
                     enforce: true,
-                    priority: 3
+                    priority: 2
                 }
             }
         }
