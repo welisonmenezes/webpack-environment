@@ -6,48 +6,131 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ImageminPlugin = require('imagemin-webpack');
+const imageminGifsicle = require('imagemin-gifsicle');
+const imageminJpegtran = require('imagemin-jpegtran');
+const imageminOptipng = require('imagemin-optipng');
+const imageminSvgo = require('imagemin-svgo');
 
-
-let SERVICE_URL;
-let minimizer;
+let mode = 'development'; // [development, production]
+let SERVICE_URL = JSON.stringify('http://development-url-here/');
+let minimizer = [];
+let plugins = [];
 let min = '.min';
-if (process.env.NODE_ENV === 'development') {
 
-    SERVICE_URL = JSON.stringify('http://development-url-here/');
+plugins.push(new CleanWebpackPlugin('./dist', {}));
 
-} else {
+plugins.push(new CopyWebpackPlugin([
+    {
+        from:'img/*',
+        to:'',
+        ignore: [ 'img/icons/*' ]
+    },
+    {
+        from:'*.html',
+        to:'',
+        ignore: []
+    },
+    {
+        from:'fonts/*',
+        to:'',
+        ignore: []
+    }
+]));
+
+plugins.push(new SpritesmithPlugin({
+    src: {
+        cwd: path.resolve(__dirname, 'img/icons'),
+        glob: '*.png'
+    },
+    target: {
+        image: path.resolve(__dirname, '../img/sprite.png'),
+        css: path.resolve(__dirname, 'scss/sprite.scss')
+    },
+    apiOptions: {
+        cssImageRef: '../img/sprite.png'
+    }
+}));
+
+plugins.push(new ExtractCssChunks(
+    {
+      filename: 'css/[name]' + min + '.css',
+      chunkFilename: 'css/vendors' + min + '.css',
+      hot: true,
+      orderWarning: true,
+      reloadAll: true,
+      cssModules: true
+    }
+));
+
+plugins.push(new webpack.DefinePlugin({
+    SERVICE_URL: SERVICE_URL
+}));
+
+plugins.push(new webpack.ProvidePlugin({
+    $: 'jquery/dist/jquery.js',
+    jQuery: 'jquery/dist/jquery.js'
+}));
+
+plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
+
+if (mode === 'production') {
 
     SERVICE_URL = JSON.stringify('http://production-url-here/');
 
-    minimizer = [
-        new UglifyJsPlugin({
-            sourceMap: true,
-            uglifyOptions: {
-                compress: { 
-                    warnings: false 
-                },
-                output: {
-                    comments: false
-                }
-            }
-        }),
-        new OptimizeCssAssetsPlugin({
-            cssProcessorOptions: {
-                sourcemap: true,
-                map: {
-                    inline: false,
-                    annotation: true
-                }
+    minimizer.push(new UglifyJsPlugin({
+        sourceMap: true,
+        uglifyOptions: {
+            compress: { 
+                warnings: false 
             },
-            cssProcessorPluginOptions: {
-                preset: ['default', { discardComments: { removeAll: true } }]
+            output: {
+                comments: false
             }
-        })
-    ];
+        }
+    }));
+
+    minimizer.push(new OptimizeCssAssetsPlugin({
+        cssProcessorOptions: {
+            sourcemap: true,
+            map: {
+                inline: false,
+                annotation: true
+            }
+        },
+        cssProcessorPluginOptions: {
+            preset: ['default', { discardComments: { removeAll: true } }]
+        }
+    }));
+
+    plugins.push(new ImageminPlugin({
+        bail: false, // Ignore errors on corrupted images
+        cache: false,
+        name: 'img/[name].[ext]',
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        exclude: [/node_modules/, /fonts/],
+        imageminOptions: {
+            plugins: [
+                imageminGifsicle({
+                    interlaced: true,
+                    optimizationLevel: 3
+                }),
+                imageminJpegtran({
+                    progressive: true
+                }),
+                imageminOptipng({
+                    optimizationLevel: 5
+                }),
+                imageminSvgo({
+                    removeViewBox: true
+                })
+            ]
+        }
+    }));
 }
 
 module.exports = {
-	mode: 'production', // [development, production]
+	mode: mode,
     watch: false,
 	entry: {
         bundle: ['./app/main.js'],
@@ -108,57 +191,7 @@ module.exports = {
     resolve: {
         modules: ['node_modules', 'img']
     },
-    plugins: [
-        new CleanWebpackPlugin('./dist', {}),
-        new CopyWebpackPlugin([
-            {
-                from:'img/*',
-                to:'',
-                ignore: [ 'img/icons/*' ]
-            },
-            {
-                from:'*.html',
-                to:'',
-                ignore: []
-            },
-            {
-                from:'fonts/*',
-                to:'',
-                ignore: []
-            }
-        ]),
-        new SpritesmithPlugin({
-            src: {
-                cwd: path.resolve(__dirname, 'img/icons'),
-                glob: '*.png'
-            },
-            target: {
-                image: path.resolve(__dirname, '../img/sprite.png'),
-                css: path.resolve(__dirname, 'scss/sprite.scss')
-            },
-            apiOptions: {
-                cssImageRef: '../img/sprite.png'
-            }
-        }),
-        new ExtractCssChunks(
-            {
-              filename: 'css/[name]' + min + '.css',
-              chunkFilename: 'css/vendors' + min + '.css',
-              hot: true,
-              orderWarning: true,
-              reloadAll: true,
-              cssModules: true
-            }
-        ),
-        new webpack.DefinePlugin({
-            SERVICE_URL: SERVICE_URL
-        }),
-        new webpack.ProvidePlugin({
-            $: 'jquery/dist/jquery.js',
-            jQuery: 'jquery/dist/jquery.js'
-        }),
-        new webpack.optimize.ModuleConcatenationPlugin()
-    ],
+    plugins: plugins,
     optimization: {
         minimizer: minimizer,
         splitChunks: {
