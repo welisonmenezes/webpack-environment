@@ -18,14 +18,7 @@ let SERVICE_URL = JSON.stringify('http://development-url-here/');
 const minimizer = [];
 const plugins = [];
 const min = '.min';
-const templateMinify = {
-    collapseWhitespace: true, 
-    removeComments: true, 
-    removeRedundantAttributes: true, 
-    removeScriptTypeAttributes: true, 
-    removeStyleLinkTypeAttributes: true, 
-    useShortDoctype: true
-};
+let templateMinify = {};
 
 plugins.push(new CleanWebpackPlugin('./dist', {}));
 
@@ -35,11 +28,6 @@ plugins.push(new CopyWebpackPlugin([
         to:'',
         ignore: [ 'img/icons/*' ]
     },
-    // {
-    //     from:'*.html',
-    //     to:'',
-    //     ignore: []
-    // },
     {
         from:'fonts/*',
         to:'',
@@ -72,10 +60,6 @@ plugins.push(new ExtractCssChunks(
     }
 ));
 
-plugins.push(new webpack.DefinePlugin({
-    SERVICE_URL: SERVICE_URL
-}));
-
 plugins.push(new webpack.ProvidePlugin({
     $: 'jquery/dist/jquery.js',
     jQuery: 'jquery/dist/jquery.js'
@@ -83,14 +67,18 @@ plugins.push(new webpack.ProvidePlugin({
 
 plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
 
-plugins.push(new HtmlWebpackPlugin({
-    template: 'index.html',
-    minify: templateMinify
-}));
-
 if (mode === 'production') {
 
     SERVICE_URL = JSON.stringify('http://production-url-here/');
+
+    templateMinify = {
+        collapseWhitespace: true, 
+        removeComments: true, 
+        removeRedundantAttributes: true, 
+        removeScriptTypeAttributes: true, 
+        removeStyleLinkTypeAttributes: true, 
+        useShortDoctype: true
+    };
 
     minimizer.push(new UglifyJsPlugin({
         sourceMap: true,
@@ -142,6 +130,15 @@ if (mode === 'production') {
         }
     }));
 }
+
+plugins.push(new webpack.DefinePlugin({
+    SERVICE_URL: SERVICE_URL
+}));
+
+plugins.push(new HtmlWebpackPlugin({
+    template: 'index.html',
+    minify: templateMinify
+}));
 
 module.exports = {
 	mode: mode,
