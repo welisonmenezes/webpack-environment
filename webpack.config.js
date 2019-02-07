@@ -167,7 +167,7 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'babel-loader',
                 query: {
-                    presets: ['es2015']
+                    presets: ['@babel/preset-env']
                 }
             },
             {
@@ -220,14 +220,14 @@ module.exports = {
                 vendors: {
                     name: 'vendors',
                     test: 'vendors',
-                    filename: 'js/[name]' + min + '.js',
+                    //filename: 'js/[name]' + min + '.js',
                     enforce: true,
                     priority: 3
                 },
                 plugins: {
                     name: 'plugins',
                     test: 'plugins',
-                    filename: 'js/[name]' + min + '.js',
+                    //filename: 'js/[name]' + min + '.js',
                     enforce: true,
                     priority: 2
                 }
