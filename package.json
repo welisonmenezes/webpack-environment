@@ -2,7 +2,6 @@
   "name": "webpack-environment",
   "version": "1.0.0",
   "description": "A case study of webpack",
-  "main": "index.js",
   "scripts": {
     "build-dev": "webpack --config webpack.config.js",
     "start-dev": "webpack-dev-server"

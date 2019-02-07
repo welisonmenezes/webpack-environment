@@ -137,6 +137,13 @@ plugins.push(new webpack.DefinePlugin({
 
 plugins.push(new HtmlWebpackPlugin({
     template: 'index.html',
+    filename: 'index.html',
+    minify: templateMinify
+}));
+
+plugins.push(new HtmlWebpackPlugin({
+    template: 'about.html',
+    filename: 'about.html',
     minify: templateMinify
 }));
 
