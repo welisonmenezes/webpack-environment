@@ -6,17 +6,26 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ImageminPlugin = require('imagemin-webpack');
 const imageminGifsicle = require('imagemin-gifsicle');
 const imageminJpegtran = require('imagemin-jpegtran');
 const imageminOptipng = require('imagemin-optipng');
 const imageminSvgo = require('imagemin-svgo');
 
-let mode = 'development'; // [development, production]
+const mode = 'development'; // [development, production]
 let SERVICE_URL = JSON.stringify('http://development-url-here/');
-let minimizer = [];
-let plugins = [];
-let min = '.min';
+const minimizer = [];
+const plugins = [];
+const min = '.min';
+const templateMinify = {
+    collapseWhitespace: true, 
+    removeComments: true, 
+    removeRedundantAttributes: true, 
+    removeScriptTypeAttributes: true, 
+    removeStyleLinkTypeAttributes: true, 
+    useShortDoctype: true
+};
 
 plugins.push(new CleanWebpackPlugin('./dist', {}));
 
@@ -26,11 +35,11 @@ plugins.push(new CopyWebpackPlugin([
         to:'',
         ignore: [ 'img/icons/*' ]
     },
-    {
-        from:'*.html',
-        to:'',
-        ignore: []
-    },
+    // {
+    //     from:'*.html',
+    //     to:'',
+    //     ignore: []
+    // },
     {
         from:'fonts/*',
         to:'',
@@ -73,6 +82,11 @@ plugins.push(new webpack.ProvidePlugin({
 }));
 
 plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
+
+plugins.push(new HtmlWebpackPlugin({
+    template: 'index.html',
+    minify: templateMinify
+}));
 
 if (mode === 'production') {
 
@@ -140,7 +154,7 @@ module.exports = {
 	output: {
 		filename: 'js/[name]' + min + '.js',
 		path: path.resolve(__dirname, 'dist'),
-        publicPath: 'dist',
+        publicPath: './',
 	},
 	module: {
         rules: [
